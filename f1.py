@@ -7,10 +7,13 @@ except ImportError as e:
 import pandas as pd
 import numpy as np
 
-
+# Set path to cache downloaded telemetry data
+# Default is off
 def set_cache(path):
     ff1.Cache.enable_cache(path)
 
+# Obtain basic information about events in the given year(s)
+# If n_year > 0, information for consecutive years are retrieved
 def get_events(start_year, n_year=0):
     years = np.linspace(start_year, start_year + n_year, int(n_year+1))
     schedule = pd.DataFrame()
@@ -26,6 +29,7 @@ def get_events(start_year, n_year=0):
             continue
     return schedule
 
+# Obtain driver race result from a particular event, by specifying year and round_num
 def get_race_result(year, round_num):
     try:
         s = ff1.get_session(int(year), int(round_num), 'Race')
@@ -34,6 +38,7 @@ def get_race_result(year, round_num):
     except:
         print('Error!!! No results loaded', year, round_num)
 
+# Get data for all the laps done by all drivers in a particular event.
 # session_num is a string - e.g. 'Practice 1', 'Practice 2', 'Practice 3', 'Sprint Qualifying', 'Sprint', 'Qualifying', 'Race'
 # or their abbrev - e.g. 'session_num1', 'session_num2', 'session_num3', 'Q', 'S', 'SQ', 'R'
 # timedelta64 are converted to string by default
@@ -49,7 +54,11 @@ def get_session_lap_data(year, round_num, session_num, time_to_str=False):
     except:
         print('Error!!! No session lap data loaded', year, round_num, session_num)
 
-
+# Get telemetry data for drivers in a particular event
+# session_num is a string - e.g. 'Practice 1', 'Practice 2', 'Practice 3', 'Sprint Qualifying', 'Sprint', 'Qualifying', 'Race'
+# or their abbrev - e.g. 'session_num1', 'session_num2', 'session_num3', 'Q', 'S', 'SQ', 'R'
+# driver_list can be None (for all drivers) or a list of strings specifying the drivers
+# time_to_str - Default = False.  Converts time to string in the return data table
 def get_session_telemetry_data(year, round_num, session_num, driver_list=None,time_to_str=False):
     try:
         s = ff1.get_session(int(year), int(round_num), session_num)
@@ -92,6 +101,7 @@ def get_session_telemetry_data(year, round_num, session_num, driver_list=None,ti
                     race.iloc[:,i] = race.iloc[:,i].astype(str)
         return race
 
+# get a list of drivers and the result for a particular session in a particular event
 def get_driver_info(year, round_num, session_num):
     return get_race_result(year, round_num)[['DriverNumber','Abbreviation','TeamName','TeamColor','FirstName','LastName']]
 
